@@ -1,0 +1,29 @@
+# Fly.io config. First run: fly volumes create drift_data --size 1 --region fra
+app = "drift-news"          # must be globally unique; change it
+primary_region = "fra"
+
+[build]
+
+[env]
+  DATA_DIR = "/data"
+  PORT = "8000"
+
+[mounts]
+  source = "drift_data"
+  destination = "/data"
+
+[http_service]
+  internal_port = 8000
+  force_https = true
+  auto_stop_machines = "off"   # keep running so feeds keep refreshing
+  auto_start_machines = true
+  min_machines_running = 1
+  [[http_service.checks]]
+    path = "/healthz"
+    interval = "30s"
+    timeout = "5s"
+    grace_period = "20s"
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "256mb"
